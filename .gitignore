@@ -18,3 +18,19 @@ datasets/
 
 node_modules/
 
+
+build/
+compile_commands.json
+/cmake-build-*
+
+derby.log
+spark-warehouse
+target
+project
+.idea
+
+/cmake-build-*
+
+data/yellow_tripdata_2016-02.csv
+data/dataSmall.mtx
+
