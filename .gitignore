@@ -2,3 +2,19 @@ venv/
 .idea/
 datasets/
 .ipynb_checkpoints/
+
+# Ignore MongoDB files in /data
+/cloud-computing-exercise-app/data/**
+
+# Keep empty folder in repo
+!/cloud-computing-exercise-app/data/.gitkeep
+
+# Ignore MongoDB files in /data
+/data/**
+
+# Keep empty folder in repo
+!/data/.gitkeep
+
+
+node_modules/
+

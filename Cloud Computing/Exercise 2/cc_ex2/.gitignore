@@ -1,0 +1,5 @@
+# Ignore MongoDB files in /data
+/data/**
+
+# Keep empty folder in repo
+!/data/.gitkeep
