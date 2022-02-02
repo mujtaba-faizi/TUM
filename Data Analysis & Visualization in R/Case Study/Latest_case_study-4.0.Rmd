@@ -1,0 +1,429 @@
+---
+title: "Data Analysis and Visualization in R (IN2339)"
+subtitle: "Case Study"
+author: "Mujtaba Shahid Faizi; Amélie Claus; Kalina Damyanova; Philipp Zent"
+
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## **MOTIVATION**
+
+According to WHO, car accidents are the leading cause of death, especially for children and young adults aged 5-29 years. The goal of this case study is to have a better understanding of the accidents that occurred during November 2018 in Barcelona. More precisely, we want to see if there is an association between the number of accidents and air quality through careful analysis and by taking other variables into account. We also aim to predict the air quality based on measurements of compounds detected in the air of Barcelona.
+
+## **DATA PREPERATION**
+
+We utilized these datasets for the data preparation steps: air_quality_Nov2017.csv, air_stations_Nov2017, accidents_2017, and transports.csv (although the file names say 2017, the actual date column inside the accidents' dataset say 2018 instead. So, we assumed the datasets to be taken from 2018). Unnecessary chunk codes are ommited in this compiled pdf-file.
+
+We prepared the final accidents, air_quality, and transports datasets to be merged/joined with each other for the data analysis section. This preparation included correcting the district names and discarding missing data. Then, we corrected the dates in the right format. We converted categories of air quality: good, moderate into 1,0 respectively. The number of accidents and mean of air quality per date (days of the month November 2018) and per district were calculated. Similarly, the number of transports in each district was also calculated. Finally, the three datasets were joined/merged on the base of district for the analysis. They were also joined/merged on the base of date. These final datasets were then used for our data analysis.
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+## Load all the needed libraries
+
+library(data.table)
+library(ggplot2)
+library(tidyr)
+library(ISLR)
+library(plotROC)
+library(dplyr)
+
+```
+
+
+```{r, echo=FALSE}
+
+##Load all required data files
+
+air_quality_dt<- fread('data/air_quality_Nov2017.csv')
+air_quality_stations_dt<- fread('data/air_stations_Nov2017.csv')
+accidents_dt<- fread('data/accidents_2017.csv')
+transports_dt<- fread('data/transports.csv')
+
+```
+
+
+```{r, echo=FALSE}
+
+##Data preparation for the accidents dataset (to be merged with updated air quality dataset)
+
+correctDistrictsForAccidentsDT <- function(dt){
+  district_names <- sort(dt[, unique(`District Name`)], decreasing = F)
+  district_names
+  dt[`District Name` == district_names[9], `District Name`:="Sants-Montjuïc"]
+  dt[`District Name` == district_names[8], `District Name`:="Sant Martí"]
+  dt[`District Name` == district_names[10], `District Name`:="Sarrià - Sant Gervasi"]
+  dt[`District Name` == district_names[4], `District Name`:="Horta-Guinardó"]
+  dt[`District Name` == district_names[3], `District Name`:="Gràcia"]
+  return (dt)
+}
+
+#correct the names of the District names
+corrected_accidents_dt <- correctDistrictsForAccidentsDT(accidents_dt)
+
+#count accidents by each district, month, day and hour
+accidents_with_count_dt <- corrected_accidents_dt[, .(Accidents = .N),
+                                       by=c('District Name', 'Month', 'Day')]
+
+#convert month names to integers 1-12
+accidents_with_count_dt[, Month := match(Month, month.name)]
+
+#concatenate day, month, year and hour to make a proper date column (to match the format in air quality dataset dates)
+accidents_with_count_dt[as.integer(Month) < 10, New_Month := paste0(0,Month)]
+accidents_with_count_dt[as.integer(Month) >= 10, New_Month := Month]
+accidents_with_count_dt[as.integer(Day) < 10, New_Day := paste0(0,Day)]
+accidents_with_count_dt[as.integer(Day) >= 10, New_Day := Day]
+#get accidents in nov only (since we only have air quality dataset from nov 2018)
+accidents_nov_dt <- accidents_with_count_dt[New_Month == 11]
+accidents_nov_dt[,Date := paste(New_Day,New_Month,'2018', sep = "/")]
+
+
+#order by date in ascending order
+final_accidents_dt <- accidents_nov_dt[order(Date, decreasing = F), 
+                                            c('District Name', 'Date', 
+                                              'Accidents')]
+
+```
+
+```{r, echo=FALSE, fig.height = 3, fig.width = 6}  
+
+## DESCRIPTIVE PLOT 1
+
+# ANNUAL COUNT OF ACCIDENTS PER DISTRICT
+# plotting the annual amount of accidents in 2018 for different districts in Barcelona
+
+mytheme <- theme(
+  plot.title = element_text(size = 10, face = "bold"),
+  axis.title.x = element_text(size = 11, face = "plain"),
+  axis.title.y = element_text(size = 11, face = "plain"),
+  axis.text.x = element_text(size = 10, face = "plain"),
+  axis.text.y = element_text(size = 10, face = "plain")
+)
+
+final_accidents_vis_dt <- final_accidents_dt[final_accidents_dt$`District Name`!="Unknown"]
+
+# set the levels in descending order
+final_accidents_vis_dt <- within(final_accidents_vis_dt, 
+                   District <- factor(`District Name`, 
+                                      levels=names(sort(table(`District Name`), 
+                                                        decreasing=TRUE))))
+#plot for accident count in each district per day
+annual_accidents_per_district <- ggplot(final_accidents_vis_dt,aes(x=District)) + 
+  geom_bar(width=0.9) + coord_flip()
+
+annual_accidents_per_district <- annual_accidents_per_district +
+  ggtitle("The district \"Exiample\" had the most accidents (in Nov 2018)") +
+  ylab("Number of Accidents") +
+  xlab("District Names of Barcelona")
+
+annual_accidents_per_district <- annual_accidents_per_district + mytheme
+annual_accidents_per_district
+
+```
+
+```{r, echo=FALSE}
+
+##Data preperation for the air quality dataset (to be merged with updated accidents dataset)
+
+correctDistrictsForAirQualityDT <- function(dt){
+  district_names <- sort(dt[, unique(`District Name`)], decreasing = F)
+  dt[`District Name` == district_names[7], `District Name`:="Sants-Montjuïc"]
+  dt[`District Name` == district_names[6], `District Name`:="Sant Martí"]
+  dt[`District Name` == district_names[4], `District Name`:="Horta-Guinardó"]
+  dt[`District Name` == district_names[3], `District Name`:="Gràcia"]
+  return (dt)
+}
+
+#convert categorical variable to a continuous variable i.e. air_quality
+air_quality_dt[`Air Quality` == "Good", Air_Quality := 1]
+air_quality_dt[`Air Quality` == "Moderate", `Air_Quality` := 0]
+
+#extract date (without the hours) from the date column
+air_quality_dt[, Date := substr(Generated, start = 1, stop = 10)]
+
+#join with air_quality stations to get relevant district names
+air_quality_with_districts_dt <- merge(air_quality_dt, air_quality_stations_dt, 
+                                       by="Station", allow.cartesian = TRUE)
+air_quality_with_districts_dt <- air_quality_with_districts_dt[,c('Air_Quality',
+                                                                  'Date', 
+                                                                  'District Name')]
+
+#update the names of the District names
+corrected_air_quality_dt <- correctDistrictsForAirQualityDT(air_quality_with_districts_dt)
+
+#get the average air quality in each day
+final_air_quality_dt <- corrected_air_quality_dt[, .(Air_Quality = 
+                                                 mean(Air_Quality, na.rm = TRUE)), 
+                                               by = c('District Name', 'Date')]
+
+```
+
+
+```{r, echo=FALSE, fig.height = 3, fig.width = 6}
+
+## DESCRIPTIVE PLOT 2
+
+# AVERAGE QUALITY OF AIR PER DISTRICT
+# plotting the average quality of air in nov 2018 for different districts in Barcelona
+
+air_quality_by_district_dt <- corrected_air_quality_dt[, .(Air_Quality = 
+                                                 mean(Air_Quality, na.rm = TRUE)), 
+                                               by = c('District Name')]
+
+#plot for accident count in each district per day
+annual_accidents_per_district <- ggplot(
+  air_quality_by_district_dt, 
+  aes(x = reorder(factor(`District Name`), +Air_Quality), Air_Quality)) + 
+  geom_bar(stat='Identity') + coord_flip()
+
+annual_accidents_per_district <- annual_accidents_per_district +
+  ggtitle("The district \"Exiample\" had the worst air quality (in Nov 2018)") +
+  ylab("Average Air Quality (0 = Moderate, 1 = Good)") +
+  xlab("District Names of Barcelona")
+
+annual_accidents_per_district <- annual_accidents_per_district + mytheme
+annual_accidents_per_district
+
+```
+
+
+```{r, echo=FALSE}
+
+##Data preperation for analysis
+
+##Join accidents dataset with the air quality dataset to get the air quality 
+#and number of accidents in one dataset
+accidents_with_air_quality_dt <- merge(final_accidents_dt, final_air_quality_dt, 
+                      by=c("District Name", "Date"))
+#order the dataset in descending order of the dates
+accidents_with_air_quality_dt <- accidents_with_air_quality_dt[order(Date, decreasing = F)]
+
+```
+
+
+## **DATA ANALYSIS**
+
+Our Claim: there exists an association between accidents and air quality.
+
+Statistical test: test for correlation between two quantitative variables i.e. no. of accidents and air quality. No assumption is made for the distribution, so we chose the spearman test.
+
+```{r, echo=TRUE, warning=FALSE}
+
+cor_value = cor.test(accidents_with_air_quality_dt$Accidents, 
+                     accidents_with_air_quality_dt$Air_Quality, 
+                     method = "spearman")
+cor_value
+
+```
+
+The p value is less than 5%, which implies that there is an association between the two variables (which statistically supports our claim)
+
+The graph below visualizes our statistically supported claim:
+
+```{r, echo=FALSE, message=FALSE, fig.height = 3, fig.width = 5}
+
+##plot that supports our claim and visualizes the statistical test above
+plot_air_quality_accidents <- ggplot(accidents_with_air_quality_dt, 
+                                     aes(Accidents, Air_Quality)) + geom_point() + 
+  geom_smooth(method = lm)
+
+plot_air_quality_accidents <- plot_air_quality_accidents +
+ ggtitle("Air quality decreases with an increasing count of accidents") +
+ xlab("Number of Accidents") +
+  ylab("Air Quality")
+
+plot_air_quality_accidents <- plot_air_quality_accidents + mytheme
+plot_air_quality_accidents
+
+```
+
+Now, we introduce a third variable into the situation i.e. "number of vehicles in each district".      
+Diagnostic plot: we construct a linear graph between accidents and air quality, facetted by vehicle count
+
+```{r, echo=FALSE, fig.height = 4, fig.width = 6, message=FALSE}
+
+##Confounding factors
+
+#before, we saw a coorelation between the number of accidents and air quality in Barcelona, through correlation tests and relevant graphs. Now, we will dive deeper into other influential relationships
+
+correctDistrictsTransportsDT <- function(dt){
+  district_names <- sort(dt[, unique(`District.Name`)], decreasing = F)
+  dt[`District.Name` == district_names[10], `District.Name`:="Sants-Montjuïc"]
+  dt[`District.Name` == district_names[9], `District.Name`:="Sant Martí"]
+  dt[`District.Name` == district_names[11], `District.Name`:="Sarrià - Sant Gervasi"]
+  dt[`District.Name` == district_names[5], `District.Name`:="Horta-Guinardó"]
+  dt[`District.Name` == district_names[4], `District.Name`:="Gràcia"]
+  return (dt)
+}
+
+#we correct the names of the districts in transports dataset
+corrected_transports_dt <- correctDistrictsTransportsDT(transports_dt)
+
+#we count the number of vehicles in each district
+transports_with_count_dt <- corrected_transports_dt[, .(Vehicles = .N), 
+                                                    by = 'District.Name']
+#change column name
+setnames(transports_with_count_dt, 'District.Name', 'District Name')
+
+#we join the two datasets to get transports, accidents and air quality in one dataset, grouped by day
+accidents_air_quality_transports_by_date_dt <- merge(accidents_with_air_quality_dt, 
+                                             transports_with_count_dt, 
+                                             by="District Name")
+
+#we plot the number of accidents and air quality, influenced (i.e. facetted) by the third variable: number of vehicles
+#we see here that the influence of the third variable changes/disrupts the association between accidents and air quality
+plot_air_quality_accidents_vehicles <- ggplot(
+  accidents_air_quality_transports_by_date_dt, aes(Accidents,Air_Quality, 
+                                                   color = factor(Vehicles))) + 
+  geom_point() + geom_smooth(method = lm)
+
+plot_air_quality_accidents_vehicles <- plot_air_quality_accidents_vehicles +
+ ggtitle("Vehicle Count disrupts the association between accidents and air quality") +
+ xlab("Number of Accidents") + ylab("Air Quality") + facet_wrap(~`District Name`)
+
+plot_air_quality_accidents_vehicles <- plot_air_quality_accidents_vehicles + 
+  labs(color = "No. of Vehicles", size = 6) + mytheme
+plot_air_quality_accidents_vehicles
+
+```
+
+
+```{r, echo=FALSE, message=FALSE}
+#we now need to get a more deeper understanding on the relationships between the third variable and the other 2 variables separately
+
+#get the air quality and accidents, grouped by district
+accidents_with_air_quality_by_district_dt <- accidents_with_air_quality_dt[, .(
+  Air_Quality = mean(Air_Quality, na.rm=TRUE), 
+  Accidents = sum(Accidents, na.rm=TRUE)), 
+  by="District Name"]
+
+#we again merge the two datasets to get transports, accidents and air quality in one dataset, grouped by district name this time
+accidents_air_quality_transports_by_district_dt <- merge(transports_with_count_dt, 
+                                accidents_with_air_quality_by_district_dt, 
+                                by="District Name")
+
+```
+
+
+```{r, echo=FALSE, fig.height = 3, fig.width = 5, message=FALSE}
+
+## DEMONSTRATIVE PLOT 1
+
+# claim: no. of accidents is associated with no. of vehicles
+
+plot_vehicles_accidents <- ggplot(accidents_air_quality_transports_by_district_dt, aes(Vehicles, Accidents)) + geom_point() + geom_smooth(method = lm)
+
+plot_vehicles_accidents <- plot_vehicles_accidents +
+ ggtitle("Number of accidents increases with an increasing vehicle count") +
+ xlab("Number of Vehicles") + ylab("Number of Accidents")
+
+plot_vehicles_accidents <- plot_vehicles_accidents + mytheme
+plot_vehicles_accidents
+#we see an correlation between vehicles and accidents. More the number of vehicles in a district, the more accidents occur
+
+```
+
+
+```{r, echo=FALSE, fig.height = 3, fig.width = 5, message=FALSE}
+
+## DEMONSTRATIVE PLOT 2
+
+# claim: air quality is associated with no. of vehicles
+
+plot_vehicles_air_quality <- ggplot(
+  accidents_air_quality_transports_by_district_dt, 
+  aes(Vehicles, Air_Quality)) + geom_point() + geom_smooth(method = lm)
+
+plot_vehicles_air_quality <- plot_vehicles_air_quality +
+ ggtitle("Air quality decreases/deteriorates with an increasing vehicle count") +
+ xlab("Number of Vehicles") + ylab("Air Quality")
+
+plot_vehicles_air_quality <- plot_vehicles_air_quality + mytheme
+plot_vehicles_air_quality
+#similarly, we also see a correlation between vehicles and air quality. More the number of vehicles in a district, the bad the air quality will be
+
+```
+
+
+Our new claims are: no. of vehicles is associated with no. of accidents and air_quality. The above demonstrative plots support these claims. This suggests a common cause relationship between the three variables i.e. no. of vehicles causes a positive effect on no. of accidents, and no. of vehicles causes a negative effect on air quality. These new associations seem logical because we can assume that the higher the transport density, the higher the population density, the more car traffic there is, which increases the number of accidents and degrades the air quality.
+
+In addition to controlling for confounding factors, we do a prediction of the quality of air based on some measured air compounds.
+
+```{r, echo=FALSE, fig.height = 3, fig.width = 5}
+
+## Prediction task : prediction of the quality of air basing on elements quantity indicators
+
+set.seed(90) # to have reproducible results
+## Preprocessing of the data
+air_quality_dt[`Air Quality` == "Good", air_quality_value:=0]
+air_quality_dt[`Air Quality` == "Moderate", `air_quality_value` := 1]
+colnames(air_quality_dt)[7] <- "O3"
+colnames(air_quality_dt)[10] <- "NO2"
+colnames(air_quality_dt)[13] <- "PM10"
+dt_prediction <- air_quality_dt[,c("air_quality_value", "O3","NO2", "PM10")]
+#we remove all rows which contains at least one NA value
+dt_prediction <- dt_prediction[complete.cases(dt_prediction),]
+
+#split between the train set and the test set : 80%/20%
+dt = sort(sample(nrow(dt_prediction), nrow(dt_prediction)*.8))
+train<-dt_prediction[dt,]
+test<-dt_prediction[-dt,]
+
+```
+
+
+```{r, echo=TRUE, message=FALSE, results='hide'}
+
+summary(glm(air_quality_value ~ O3 + NO2 + PM10,data = train,family = binomial))
+##In reality, the air quality status (0 i.e. "good" or 1 i.e. "moderate") is established by 
+#measuring the quantity of PM10, O3 and NO2. However, according to the 
+#p-values, only NO2 and PM10 significantly associates (p<5%) with the response 
+#variable and thus, we used only these 2 variables for our prediction task.
+glm.fit <- glm(air_quality_value ~ NO2 + PM10,data = train,family = binomial)
+glm.probs <- predict(glm.fit, newdata = test,type = "response")
+glm.pred <- ifelse(glm.probs > 0.5, 1, 0) # cutoff = 0.5
+
+```
+
+
+```{r, echo=FALSE, fig.height = 3, fig.width = 5}
+pred <- glm.pred
+test[, mu_hat := glm.probs]
+ggroc <- ggplot(test, aes(d=air_quality_value, m=mu_hat)) + geom_roc() + geom_abline() + mytheme +
+ ggtitle("ROC Curve")
+ggroc
+
+```
+
+```{r, echo=FALSE}
+
+imbalance <- test[,.N/nrow(test), by = air_quality_value]
+imbalance
+##As there is a huge imbalance in our dataset (almost 97% of class 0), we used 
+#the AUC to capture the overall performance of our model. This value is not 
+#affected by an imbalance in classes.
+
+```
+
+We checked the imbalance between the classes in our dataset, and as there is a huge imbalance in our dataset (~ 97% of class 0), we use the AUC to capture the overall performance of our model. This metric is not affected by an imbalance in classes.
+
+
+```{r}
+
+calc_auc(ggroc)
+
+```
+
+AUC = 0.9757886. Higher the AUC, better the model is at predicting 0 classes as 0 and 1 classes as 1. With an AUC of ~98%, we can conclude that the model can very well distinguish between the two classes with certainty.
+
+
+## **CONCLUSION**
+
+According to the above analysis, it is clear that we see a pattern in the accidents - air quality relationship when controlling for the number of vehicles i.e. higher accident counts and lower air quality counts represent snapshots with high traffic 
+intensity. We can speak of a common cause relationship for Z (number of vehicles) which causes both A (car accidents) and B (air quality). This has invalidated our first claim, that there exists an association or causation relationship between accidents and air quality. 
+
+In addition, we performed a prediction task to predict the air quality status. We get good prediction performance (i.e. AUC of ~98%) basing the Logistic Regression on PM10 and NO2 quantities.
