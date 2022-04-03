@@ -30,6 +30,7 @@ project
 .idea
 
 /cmake-build-*
+cmake-build-debug/
 
 data/yellow_tripdata_2016-02.csv
 data/dataSmall.mtx
