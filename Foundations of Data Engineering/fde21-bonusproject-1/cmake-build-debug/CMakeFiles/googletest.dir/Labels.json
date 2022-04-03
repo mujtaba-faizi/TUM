@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/CMakeFiles/googletest"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/CMakeFiles/googletest.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/CMakeFiles/googletest-complete.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/googletest-stamp/googletest-build.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/googletest-stamp/googletest-configure.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/googletest-stamp/googletest-download.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/googletest-stamp/googletest-install.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/googletest-stamp/googletest-mkdir.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/googletest-stamp/googletest-patch.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/googletest-stamp/googletest-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"googletest"
+		],
+		"name" : "googletest"
+	}
+}

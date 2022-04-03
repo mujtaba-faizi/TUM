@@ -1,0 +1,1 @@
+cmd='/snap/clion/180/bin/cmake/linux/bin/cmake;-DCMAKE_INSTALL_PREFIX=/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/gtest;-DCMAKE_C_COMPILER=/usr/bin/gcc;-DCMAKE_CXX_COMPILER=/usr/bin/g++;-DCMAKE_CXX_FLAGS=;-GNinja;<SOURCE_DIR><SOURCE_SUBDIR>'

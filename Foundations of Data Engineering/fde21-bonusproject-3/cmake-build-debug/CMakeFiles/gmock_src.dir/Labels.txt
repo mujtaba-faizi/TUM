@@ -1,0 +1,13 @@
+# Target labels
+ gmock_src
+# Source files and their labels
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/CMakeFiles/gmock_src
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/CMakeFiles/gmock_src.rule
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/CMakeFiles/gmock_src-complete.rule
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-build.rule
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-configure.rule
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-download.rule
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-install.rule
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-mkdir.rule
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-patch.rule
+/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-update.rule

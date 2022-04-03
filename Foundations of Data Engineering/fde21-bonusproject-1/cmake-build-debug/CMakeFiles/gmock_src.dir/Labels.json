@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/CMakeFiles/gmock_src"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/CMakeFiles/gmock_src.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/CMakeFiles/gmock_src-complete.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-build.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-configure.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-download.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-install.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-mkdir.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-patch.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Downloads/fde21-bonusproject-1/cmake-build-debug/vendor/gtm/src/gmock_src-stamp/gmock_src-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"gmock_src"
+		],
+		"name" : "gmock_src"
+	}
+}

@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/JoinQuery.hpp
+string
+-
+
+/home/mujtaba/Downloads/fde21-bonusproject-1/src/JoinQuery.cpp
+JoinQuery.hpp
+/home/mujtaba/Downloads/fde21-bonusproject-1/src/JoinQuery.hpp
+assert.h
+-
+fstream
+-
+iostream
+-
+thread
+-
+

@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/CMakeFiles/gtest_src"
+		},
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/CMakeFiles/gtest_src.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/CMakeFiles/gtest_src-complete.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gtest_src-stamp/gtest_src-build.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gtest_src-stamp/gtest_src-configure.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gtest_src-stamp/gtest_src-download.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gtest_src-stamp/gtest_src-install.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gtest_src-stamp/gtest_src-mkdir.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gtest_src-stamp/gtest_src-patch.rule"
+		},
+		{
+			"file" : "/home/mujtaba/Documents/fde21-bonusproject-3/cmake-build-debug/vendor/gtm/src/gtest_src-stamp/gtest_src-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"gtest_src"
+		],
+		"name" : "gtest_src"
+	}
+}
